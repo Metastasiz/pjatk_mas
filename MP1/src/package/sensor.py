@@ -36,6 +36,10 @@ class sensor():
 class lidar(sensor):
 	_sensor_max = 4
 	_sensor_efficiency = 0.47 #model_sample_2345
+	_diminising_efficiency = 0.95
+
+	def getSensorTotalEfficiency(self):
+		return self._sensor_efficiency * sum(self.getSensorPower()) * pow(self.__class__._diminising_efficiency,self.getSensorNumber())
 
 	
 if __name__ == "__main__":
