@@ -5,14 +5,6 @@ from package import *
 from package.robot import robotExtent
 from package.sensor import lidar
 
-##################################################################################
-#		This MP1 uses my custom package that is located on PYPI named metastasiz
-#		The package fixes issues when importing and has no other impact
-#		The package is required only in the module robot.py
-#		The source code is here https://github.com/Metastasiz/metastasiz_package
-#		Must do: pip install metastasiz==0.1.1
-##################################################################################
-
 ######################################
 #		The Extent
 ######################################

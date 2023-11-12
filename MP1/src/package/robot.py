@@ -1,20 +1,24 @@
 from pathlib import Path
 import pickle
 
-##################################################################################
-#		This MP1 uses my package that is located on PYPI named metastasiz
-#		The package fixes some issue when importing and has no other impact
-#		The package is required in the module robot.py
-#		The source code is here https://github.com/Metastasiz/metastasiz_package
-#		Must do: pip install metastasiz==0.1.1
-##################################################################################
-
-from metastasiz import *
 main_dir = "MP1"
-package_dir = "src/package"
-appendPath(main_dir,package_dir)
+path_to_package = "src/package"
+max_subDir = 10
+import sys
+import re
+path_to_add = Path().resolve()
+for _ in range(max_subDir):
+    if re.search(main_dir+"$",str(path_to_add)):
+        break
+    path_to_add = path_to_add.parent
+path_to_target = path_to_package.split("/")
+for dir_ in path_to_target:
+    path_to_add = path_to_add / dir_
+sys.path.append(str(path_to_add))
 
 from vector3 import vector3
+from path import *
+from utils import *
 
 path_to_target_extent = "data/robotExtent.pickle"
 
