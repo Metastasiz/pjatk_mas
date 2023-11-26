@@ -20,10 +20,10 @@ class engineerRobot():
         engineerRobotExtent.addInstance(self)
 
     def setID(self):
-        assignID = idGenerator(8)
+        assignID = "EGRB-"+idGenerator(8)
         extent = engineerRobotExtent.getExtent()
         while assignID in extent:
-            assignID = idGenerator(8)
+            assignID = "EGRB-"+idGenerator(8)
         self.id_ = assignID
     def setEngineerID(self,engineerID):
         self.engineerID = engineerID

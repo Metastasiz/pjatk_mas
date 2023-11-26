@@ -19,7 +19,8 @@ class engineer():
 
         self.scheduleIDList = []
         self.bossID = None
-        self.subordinateIDSet = set()
+        self.subordinateIDList = {}
+        self.licenseIDList = set()
 
     def setID(self):
         assignID = "EG-"+idGenerator(8)
@@ -35,42 +36,79 @@ class engineer():
     def getName(self):
         return self.name_
 
-    def addSubordinateID(self,*subID):
-        for sID in subID:
+    def addSubordinate(self,*engineers):
+        for engi in engineers:
+            if not isinstance(engi,engineer):
+                print(engi.__class__.__name__,"is not instance of class engineer")
+                continue
+            sID = engi.getID()
             #checks if exist
             if sID not in engineerExtent.getExtent():
                 continue
             #checks if not added
-            if sID not in self.subordinateIDSet:
-                self.subordinateIDSet.add(sID)
+            if sID not in self.subordinateIDList:
+                self.subordinateIDList[sID] = engi
+                #checks if boss not self
                 if engineerExtent.getInstance(sID).getBossID != self.getID():
-                    engineerExtent.getInstance(sID).addBossID(self.getID())
-    def addBossID(self,bossID):
-        self.bossID = bossID
-        boss = engineerExtent.getInstance(bossID)
-        if not boss.containSubordinateID(self.getID()):
-            boss.addSubordinateID(self.getID())
+                    engineerExtent.getInstance(sID).addBoss(self)
+    def addBoss(self,engi):
+        if not isinstance(engi,engineer):
+            print(engi.__class__.__name__,"is not instance of class engineer")
+        self.bossID = engi.getID()
+        if not engi.containSubordinateID(self.getID()):
+            engi.addSubordinate(self)
+    
+    def addLicenseID(self, *licenseID):
+        from package.license import license, licenseExtent
+        for lID in licenseID:            
+            #checks if not added
+            if lID not in self.getLicenseID():
+                self.licenseIDList.add(lID)
+
+            #reverse connection, not necessary because called through constructor
+            #checks if exist
+            if lID not in licenseExtent.getExtent():
+                continue
+            l = licenseExtent.getInstance(lID)
+            #checks if same
+            if not self.getID() == l.getEngineerID():
+                l.setEngineerID(self.getID())
+    def removeLicenseID(self, licenseID):
+        from package.license import license, licenseExtent
+        #checks if exist
+        if licenseID in self.getLicenseID():
+            self.licenseIDList.remove(licenseID)
+        
+        #reverse connection
+        #checks if exist
+        if licenseID in licenseExtent.getExtent():
+            #delete
+            licenseExtent.getInstance(licenseID).removeLink()
+    def getLicenseID(self):
+        return self.licenseIDList
 
     def removeSubordinateID(self,subID):
-        self.subordinateIDSet.discard(subID)
-        engineerExtent.getInstance(sID).removeBossID(self.getID())
-    def removeBossID(self):
+        if not self.containSubordinateID(subID):
+            return
+        engi = engineer(self.subordinateIDList.pop(subID))
+        engi.removeBoss()
+    def removeBoss(self):
         self.bossID = None
 
     def containSubordinateID(self,subID):
-        if subID in self.subordinateIDSet:
+        if subID in self.subordinateIDList:
             return True
         return False
     def getSubordinateByID(self,subID):
-        if subID not in engineerExtent.getExtent():
-            print("ID is not found in the extent")
+        if subID in self.subordinateIDList:
+            return self.subordinateIDList.get(subID)
+        if subID in engineerExtent.getExtent():
+            print("ID is not subordinate of this engineer but found in the extent")
             return None
-        if subID not in self.subordinateIDSet:
-            print("ID is not subordinate of this engineer")
-            return None
-        return engineerExtent.getInstance(subID)
+        print("ID is not found in the extent")
+        return None
     def getSubordinateID(self):
-        return self.subordinateIDSet
+        return self.subordinateIDList
     def getBossID(self):
         return self.bossID
 
@@ -104,6 +142,10 @@ class engineerExtent():
     @classmethod
     def getExtent(cls):
         return cls.extent
+
+    @classmethod
+    def removeInstance(cls,id: str):
+        del cls.extent[id]
 
     @classmethod
     def clearExtent(cls):

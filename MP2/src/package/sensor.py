@@ -23,10 +23,10 @@ class sensor():
 		self.robotID_ = None
 
 	def setID(self):
-		assignID = "S-"+idGenerator(8)
+		assignID = "RBS-"+idGenerator(8)
 		extent = sensorExtent.getExtent()
 		while assignID in extent:
-			assignID = "S-"+idGenerator(8)
+			assignID = "RBS-"+idGenerator(8)
 		self.id_ = assignID
 	def setSensorNumber(self,*sensor_power):
 		self.sensor_num_ = len(sensor_power)
